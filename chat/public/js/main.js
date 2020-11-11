@@ -1,6 +1,9 @@
+//front end stuff goes here
 const socket = io();
 const chatForm = document.getElementById("chat-form");
 const chatMessage = document.querySelector(".chat-messages");
+const roomName = document.getElementById("room-name");
+const userList = document.getElementById("users")
 
 //Getting username and chat room from url params
 const {username,room} = Qs.parse(location.search,{
@@ -8,9 +11,17 @@ const {username,room} = Qs.parse(location.search,{
 });
 
 //joining chat room
+//emit is responsible for sending messages
 socket.emit("joinRooms",{
     username,
     room
+});
+
+//get room and user
+////on is responsible for listening for incoming messages messages
+socket.on('roomUsers', ({ room, users }) => {
+    outputRoomName(room);
+    outputUsers(users);
 });
 
 //message from server
@@ -48,4 +59,17 @@ const outputMessage=(message)=>{
                 </p>`;
     //whenever message is create, it should add new div to chat-messages
     document.querySelector(".chat-messages").appendChild(div)
+};
+
+//adding room nae to dom
+const outputRoomName=(room)=>{
+    roomName.innerText = room
+};
+
+//Adding users to dom
+
+const outputUsers=(users)=>{
+    userList.innerHTML = `
+    ${users.map(user=>`<li>${user.username}</li>`).join("")}
+    `
 }
